@@ -1,0 +1,73 @@
+<html>
+<head>
+<style>
+#main {
+    width: 400px;
+    height: 200px;
+    background-color: aqua;
+    border-radius: 16px;
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+#voltage {
+  height: 200px;
+  line-height: 200px;
+  text-align: center;
+  font-size: 40px;
+  font-family: "Arial", Helvetica, sans-serif;
+
+}
+</style>
+<title>DC Voltmeter</title>
+</head>
+<body onload="{setInterval(getVoltage, 500);}" onkeypress="check()">
+<div id="main">
+<div id="voltage">Waiting for response...</div>
+<input type=text id="devid" value="4e0033000751353530373132" /><input type=text id="accto" value="f636d55ac9a22efcdc8d1ad6ead3908865c5a16a" /><input type=button value="Set ID" onclick="{
+deviceID = document.getElementById('devid').value;
+accessToken = document.getElementById('accto').value;
+}" />
+</div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" type="text/javascript"></script>
+<script>
+
+var volts = 0;
+var deviceID = "4e0033000751353530373132";
+var accessToken = "f636d55ac9a22efcdc8d1ad6ead3908865c5a16a";
+var varName = "volt";
+function check(){
+	if(event.keyCode==97){
+		setDevice();
+	}	
+}
+function setDevice(){
+    var deviceIdentification = prompt("Enter Photon Device ID (look at devices section in Particle IDE):", deviceID);
+	var token = prompt("Enter Photon access token (look at settings section in Particle IDE):", accessToken);
+	deviceID = deviceIdentifaction;
+	accessToken = token;
+	window.localStorage.setItem("devid", accessToken);
+	window.localStorage.setItem("accesstoken", accessToken);
+}
+function getVoltage(){
+
+
+    requestURL = "https://api.spark.io/v1/devices/" + deviceID + "/" + varName + "/?access_token=" + accessToken;
+    $.getJSON(requestURL, function(json) {
+             volts = json.result;
+			 volts = volts.toFixed(3);
+			 document.getElementById("voltage").innerHTML = volts + " Volts";
+			 if(volts >= 30){
+			 $("#voltage").css('color', 'red');
+			 }
+			 else {
+			 $("#voltage").css('color', 'black');
+			 }
+             });
+}
+</script>
+</html>
